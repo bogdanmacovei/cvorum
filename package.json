@@ -1,0 +1,11 @@
+{
+  "name": "cvorum",
+  "version": "1.0.0",
+  "description": "forum",
+  "main": "app.js",
+  "scripts": {
+    "test": "start"
+  },
+  "author": "eu",
+  "license": "ISC"
+}

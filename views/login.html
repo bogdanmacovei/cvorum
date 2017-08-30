@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<img class = "bannerimage" src = "/banner2cv.png"> </div>
+	<link rel="stylesheet" type="text/css" href="default.css">
+	<title> Cvorum: Log in </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
+	<link rel="shortcut icon" type="image/x-icon" href="/iconsite.png" />
+</head>
+<body>
+	<h1> Authentication </h1>
+
+	<div class = "content1">
+		<p> <b>User name</b> </p>
+		<input type = "text" id = "un" placeholder = "User name">
+
+		<p> <b>Password</b> </p>
+		<input type = "password" id = "pw">
+		<br><br>
+
+		<button id = "login" class = "postbtn" style = "width:%"> Log in </button>
+
+		<p id = "error"> </p>
+	</div>
+
+	<p> New here? <a href = "/register"><u>Click here</u></a> to create an account. </p>
+
+	<script>
+		$('#login').click(function(){
+			var un = $('#un').val();
+			var pw = $('#pw').val();
+
+
+			$.get('/selectuserwhere/' + un, function(date){
+				if(pw === date[0].password){
+					document.cookie = date[0].id;
+					alert('Login succesful');
+					window.location = '/';
+				}
+				else{
+					$('#error').empty();
+					$('#error').append('Wrong username or password. Try again.');
+					document.getElementById('pw').value = '';
+				}
+			});
+		});
+	</script>
+</body>
+</html>

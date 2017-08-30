@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<link rel="shortcut icon" type="image/x-icon" href="/iconsite.png" />
+<html>
+<head>
+	<img class = "bannerimage" src = "banner2cv.png"> </div>
+	<title id = "page_id">Cvorum: Post #</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="default.css" >
+</head>
+
+<body>
+
+	<div class = "bar"> <a href = "/">Home</a>&emsp;<a href = "/browse">Browse posts</a> </div>
+	
+	<div id = "main">
+	<h2> 
+		<font size ="5"> <div class = "title"> </div> </font> 
+		<font size = "3"> <div class = "info"> </div>
+  		<a style="cursor:pointer; color:black" class = "delete"><u>Delete</u></a> </font>
+	</h2>
+  	<font size ="4"><div class = "content"></div></font>
+  	
+
+  	<br><a style="cursor:pointer; color:black" id = "flip">Leave a comment</a>
+  	<br>
+  	<div id = "panel">
+  		<div class = "content1">
+  		<textarea maxlength="250" placeholder = "Type comment here..." id = "comment" rows = "7" cols = "131"></textarea> <br> <br>
+  		<button id = "post" class = "postbtn" style = "width:15%">Post comment</button>
+  		</div>
+  	</div> <br>
+
+
+  	<font size = "4"><b id = "commenttag"></b></font>
+
+  	<div class = "posts"> </div>
+  </div>
+
+  <!-- Right column -->
+  <div id = "sidebar">
+  <br>
+  	<div class = "content3"> 
+        <div align = "center" ng-app="myApp" ng-controller="customersCtrl"> <img src = {{img}} style = "border-radius: 4px; width:90%;"> <br> Welcome, <a href = {{link}}><b>{{ first_name }}</b></a>! </div>
+    </div>
+
+  	<br>
+
+  	<!-- <div class = "content3"> 
+  		<div ng-controller="namesCtrl">
+
+		<p><b>Search for title</b></p>
+
+		<p><input type="text" ng-model="test"></p>
+
+		<ul>
+			<div ng-show = "test">
+			  	<li ng-repeat="x in titles | filter: test">
+		    			{{ x }}
+		  		</li>
+		  	</div>
+		</ul>
+
+		</div>
+  	</div> -->
+
+  </div>
+
+
+	<script>
+		var uid = document.cookie;
+
+		if (!uid) {
+			$('#flip').hide();
+		}
+
+		var url = new URL(window.location.href);
+		var pid = url.searchParams.get('id');
+
+		var app = angular.module('myApp', []);
+	    app.controller('customersCtrl', function($scope, $http) {
+	        if (document.cookie) {
+	            $http.get('/selectuserbyid/' + document.cookie).then(function(response) {
+	   		        $scope.first_name = response.data[0].first_name;
+	                $scope.link = '/profile.html?userid=' + document.cookie + '&tab=posts';
+	                $scope.img = response.data[0].img;
+	            });
+	        } 
+	        else {
+	            $scope.first_name = 'Guest';
+	        }
+	     });
+
+		$('#page_id').append(pid);
+
+		function write_posts(nr, date){
+			$('#commenttag').append('Comments(' + nr + ')<br><br>');
+  			for(var i = nr - 1; i >= 0; i--){
+  				$('.posts').append('<fieldset>\
+  									<div id = "column1">\
+										<img src = "' + date[i].img + '" style="width:100%; height:100%; border-radius: 60px;">\
+  										<b>\
+  											<a href = "/profile.html?userid=' + date[i].user_id + '&tab=posts">' +
+  												date[i].user_name + '</a>\
+  										</b> \
+  										<br>' + date[i].date + 
+  										'<a style="cursor:pointer; color:black;" class = "' + date[i].user_id + '" id = "' 
+  										+ date[i].id + '"> <br>[' + 'Delete' + ']</a>\
+  									</div>\
+									\
+  									<div id = "column2">'
+  										+ date[i].comment +
+  										'</div>\
+  									</fieldset> <br>'
+  				);
+  				if(date[i].user_id != document.cookie)
+  					$('.' + date[i].user_id).hide();
+  			}
+  		}
+
+		// get comments for this post
+
+		$.get('/selectallcomments/' + pid, function(date) {
+  			var nr = date.length;
+
+  			for (var i = 0; i < nr; ++i) {
+  				date[i].comment = date[i].comment.replace(/\n/g, '<br>');
+  				if (!date[i].img)
+  					date[i].img = '/profile2test.png';
+  			}
+
+  			write_posts(nr, date);
+  		});
+
+		$.get('/post/' + pid, function(date){
+			$('.title').append(date[0].title);
+			$('.info').append('by <a href = "/profile.html?userid=' + date[0].user_id + '&tab=posts">' + date[0].user_name + '</a> on ' + date[0].date);
+
+			date[0].content = date[0].content.replace(/\n/g, '<br>');
+			$('.content').append(date[0].content);
+
+			if(uid != date[0].user_id)
+				$('.delete').hide();
+		});
+
+		//delete post
+		$('.delete').click(function(){
+			$.get('/deletecommentpost/' + pid, function(date){});
+
+			$.get('/deletepost/' + pid, function(date){
+				alert('Post deleted');
+  				window.location = '/browse.html';
+			});
+			
+  		});
+
+  		//create comment
+  		$('#panel').hide();
+		$(document).ready(function(){
+		    $("#flip").click(function(){
+		        $("#panel").slideToggle("medium");
+		    });
+		}); 
+
+		//delete comment
+
+		$(function(){
+  			$('a').click(function(){
+  				if($(this).attr('id') == 'flip' || $(this).attr('class') == 'delete')
+  					return;
+  				$.get('/deletecomment/' + $(this).attr('id'), function(date){});
+  				// window.location = '/post.html?' + pid;
+  				location.reload();
+  			});
+  		});
+
+		//leave a comment button
+		$('#post').click(function(){
+			var data = {};
+			data.comment = $('#comment').val();
+
+			var d = new Date();
+
+			data._date = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' 
+							+ d.getMinutes(); 
+
+			data.post_id = pid;
+			data.user_id = uid;
+
+			$.post('/insertcomment', data, function(date){}, 'json');
+
+			alert('Comment inserted ' + data._date);
+			window.location = '/post.html?id=' + pid;
+		});
+
+		// AngularJS + jQuery
+
+		angular.controller('namesCtrl', function($scope) {
+
+			var arr = [];
+
+			$.get('/selectpost', function(data){
+				for (var i = 0; i < data.length; ++i)
+					arr[i] = data[i].title;
+			});
+
+			$scope.titles = arr;
+		});
+
+	</script>
+
+</body>
+</html>

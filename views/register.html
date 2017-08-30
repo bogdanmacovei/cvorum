@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<img class = "bannerimage" src = "/banner2cv.png"> </div>
+	<link rel="stylesheet" type="text/css" href="default.css">
+	<title> Cvorum: Register </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
+	<link rel="shortcut icon" type="image/x-icon" href="/iconsite.png" />
+</head>
+
+<body>
+	<h1> Create account </h1>
+
+	<div class = "content1">
+		<p> <b>First name</b> </p>
+		<input type = "text" id = "fn" placeholder = "First name">
+
+		<p> <b>Last name</b> </p>
+		<input type = "text" id = "ln" placeholder = "Last name">
+
+		<p> <b>User name</b> </p>
+		<input type = "text" id = "un" placeholder = "User name">
+
+		<p> <b>Password</b> </p>
+		<input type = "password" id = "pw">
+		<br><br>
+
+		<button id = "submit" class = "postbtn"> Send information </button>
+	</div>
+
+	<script>
+		$('#submit').click(function(){
+			var fn = $('#fn').val();
+			var ln = $('#ln').val();
+			var un = $('#un').val();
+			var pw = $('#pw').val();
+
+			var data = {};
+			data.fn = fn;
+			data.ln = ln;
+			data.un = un;
+			data.pw = pw;
+
+			var d = new Date();
+			data.jd = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+
+			$.post('/insertuser', data, function(date){}, 'json');
+
+			alert('Register succesful!');
+			window.location = '/login';
+		});
+	</script>
+
+</body>
+
+</html>

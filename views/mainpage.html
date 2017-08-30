@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="shortcut icon" type="image/x-icon" href="/iconsite.png" />
+	<img class = "bannerimage" src = "/banner2cv.png"> </div> <br>
+	<title> Cvorum: Homepage </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="default.css">
+</head>
+<body>
+
+	<div class = "bar"> 
+		<a style="cursor:pointer; color:black; display:none;" id = "logout"> Log out &emsp;</a>
+		<a href = "/browse" id = "browse"> Browse posts </a>
+	</div>
+
+	<div ng-app = "myApp" ng-controller = "myCtrl">
+		<h1 style = "display: none" id = "hello"> Good day, <a href = {{link}}><strong id = "name"></strong></a>! </h1>
+	</div>
+	<h2 style="display:none" id = "welcome">Welcome to our forum! To use it, please <a href = "/login"><u>log in</u></a>.</h2>
+
+
+	<script>
+
+		var id = document.cookie;
+
+		var app = angular.module('myApp', []);
+		app.controller('myCtrl', function($scope) {
+			$scope.link = '/profile.html?userid=' + id + '&tab=posts';
+		});
+
+		if(!id){
+			$('#welcome').show();
+		}
+		else{
+			$('#logout').show();
+			$('#hello').show();
+			$('#welcome').hide();
+			$.get('/selectuserbyid/' + id, function(date){
+				$('#name').empty();
+				$('#name').append(date[0].first_name);
+			});
+		}
+
+		$('#logout').click(function(){
+			document.cookie = '';
+			alert('Logged out');
+			window.location = '/login';
+		})
+
+		$('#browse').click(function(){
+			window.location = '/browse';
+		})
+	</script>
+
+</body>
+</html>

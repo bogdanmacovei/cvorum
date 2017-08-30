@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Cvorum: Browse Posts</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="default.css">
+  <link rel="shortcut icon" type="image/x-icon" href="/iconsite.png" />
+  <img class = "bannerimage" src = "/banner2cv.png"> </div>
+  <br>
+</head>
+<body>
+
+  <div class = "bar">
+	   <a href = '/'>Home</a> &emsp;
+  	 <a style="cursor:pointer; color:black" id = "flip">Create new post</a>
+  </div>
+
+  <div id = "main">
+    	<div id = "panel"> <br>
+    		<div class = "content1">
+    		<textarea maxlength="30" placeholder = "Title" id = "title" cols = "131" rows = "1"></textarea> <br> <br>
+    		<textarea maxlength="250" placeholder = "Content" id = "content" cols = "131" rows = "7"></textarea> <br> <br>
+    		<button class = "postbtn" id = "post" style = "width:15%"> Post </button>
+    		</div>
+    	</div>
+    	<br>
+
+    	   <div class = "posts"> </div>
+      </div>
+
+  <div id = "sidebar"> <br>
+    <div class = "content3"> 
+
+        <div align = "center" ng-app="myApp" ng-controller="customersCtrl"> <img src = {{img}} style = "border-radius: 4px; width:90%;"> <br> Welcome, <a href = {{link}}><b>{{ first_name }}</b></a>! </div>
+
+    </div>
+
+  </div>
+
+  	<script>
+
+    if (!document.cookie)
+      $('#flip').hide();
+
+    // select user by id with AngularJS
+
+      var app = angular.module('myApp', []);
+      app.controller('customersCtrl', function($scope, $http) {
+          if (document.cookie) {
+              $http.get('/selectuserbyid/' + document.cookie).then(function(response) {
+                $scope.first_name = response.data[0].first_name;
+                $scope.link = '/profile.html?userid=' + document.cookie + '&tab=posts';
+                $scope.img = response.data[0].img;
+              });
+          } 
+          else {
+            $scope.first_name = 'Guest';
+          }
+      });
+
+  		function write_posts(nr, date) {
+  			for(var i = nr - 1; i >= 0; i--){
+  				$('.posts').append('<div class = "content1">\
+  									            <div>\
+                                  <font size ="5" >\
+                                    <a href = "/post.html?id=' + date[i].id + '" > '+ date[i].title +' </a>\
+                                  </font>\
+                                </div>\
+  									          by <b><a href = "/profile.html?userid='+ date[i].user_id + '&tab=posts">' + date[i].user_name +'</a></b> on ' + date[i].date + ' <br><br> \
+  									<a style="cursor:pointer; color:black" class = "' + date[i].user_id + '" id = "' + date[i].id + '"> ' + 'Delete' + '</a>\
+  									</div> \
+  									<br>'
+  				);
+  				if(date[i].user_id != document.cookie)
+  					$('.' + date[i].user_id).hide();
+  			}
+  		}
+
+  		//delete
+  		$(function(){
+  			$('a').click(function(){
+  				if($(this).attr('id') == 'flip')
+  					return;
+          if(!$(this).attr('id'))
+            return;
+
+  				$.get('/deletepost/' + $(this).attr('id'), function(date){});
+  				window.location = '/browse';
+  			});
+  		});
+
+
+  		$.get('/selectallpost', function(date){
+  			var nr = date.length;
+  			write_posts(nr, date);
+  			
+  		});
+
+  		//create post
+  		$('#panel').hide();
+
+		  $(document).ready(function(){
+		    $("#flip").click(function(){
+		        $("#panel").slideToggle("medium");
+		    });
+		  }); 
+  		
+
+		  $('#post').click(function(){
+  			var ttl = $('#title').val();
+  			var cnt = $('#content').val();
+  			var uid = document.cookie;
+
+  			var data = {};
+  			var d = new Date();
+  			data.title = ttl;
+  			data.content = cnt;
+  			data.user_id = uid;
+  			data._date = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' 
+  							+ d.getMinutes(); 
+
+  			$.post('/insertpost', data, function(date){}, 'json');
+  			alert('Post created ' + data._date);
+  			window.location = '/browse';
+
+		});
+
+
+
+  	</script>
+
+  	
+	
+</body>
+</html>
