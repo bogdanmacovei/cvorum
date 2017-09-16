@@ -13,7 +13,7 @@
 
 <body>
 
-	<div class = "bar"> <a href = "/">Home</a>&emsp;<a href = "/browse">Browse posts</a> </div>
+	<div class = "bar"> <a href = "/">Home</a>&emsp;<a href = "/browse.html?page=1">Browse posts</a> </div>
 	
 	<div id = "main">
 	<h2> 
@@ -134,7 +134,7 @@
   			write_posts(nr, date);
   		});
 
-		$.get('/post/' + pid, function(date){
+		$.get('/post/' + pid, function(date) {
 			$('.title').append(date[0].title);
 			$('.info').append('by <a href = "/profile.html?userid=' + date[0].user_id + '&tab=posts">' + date[0].user_name + '</a> on ' + date[0].date);
 
@@ -146,20 +146,20 @@
 		});
 
 		//delete post
-		$('.delete').click(function(){
+		$('.delete').click(function() {
 			$.get('/deletecommentpost/' + pid, function(date){});
 
-			$.get('/deletepost/' + pid, function(date){
+			$.get('/deletepost/' + pid, function(date) {
 				alert('Post deleted');
-  				window.location = '/browse.html';
+  				window.location = '/browse.html?page=1';
 			});
 			
   		});
 
   		//create comment
   		$('#panel').hide();
-		$(document).ready(function(){
-		    $("#flip").click(function(){
+		$(document).ready(function() {
+		    $("#flip").click(function() {
 		        $("#panel").slideToggle("medium");
 		    });
 		}); 

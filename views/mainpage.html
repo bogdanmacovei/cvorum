@@ -12,7 +12,7 @@
 
 	<div class = "bar"> 
 		<a style="cursor:pointer; color:black; display:none;" id = "logout"> Log out &emsp;</a>
-		<a href = "/browse" id = "browse"> Browse posts </a>
+		<a href = "/browse.html?page=1" id = "browse"> Browse posts </a>
 	</div>
 
 	<div ng-app = "myApp" ng-controller = "myCtrl">
@@ -50,7 +50,7 @@
 		})
 
 		$('#browse').click(function(){
-			window.location = '/browse';
+			window.location = '/browse.html?page=1';
 		})
 	</script>
 

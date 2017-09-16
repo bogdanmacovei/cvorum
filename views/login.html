@@ -26,23 +26,30 @@
 	<p> New here? <a href = "/register"><u>Click here</u></a> to create an account. </p>
 
 	<script>
-		$('#login').click(function(){
-			var un = $('#un').val();
-			var pw = $('#pw').val();
+		$('#login').click(function() {
 
+			// transmit objUser in server pentru verificare parola
+			// intoarce un bool in variabila data
 
-			$.get('/selectuserwhere/' + un, function(date){
-				if(pw === date[0].password){
-					document.cookie = date[0].id;
-					alert('Login succesful');
-					window.location = '/';
+			var objUser = {};
+			objUser.username = $('#un').val();
+			objUser.password = $('#pw').val();
+
+			$.post('/verifypwd', objUser, function (data) {
+				if (data === true) {
+					$.get('/selectuserwhere/' + $('#un').val(), function(date) {
+						document.cookie = date[0].id;
+						alert('Login succesful');
+						window.location = '/';
+					});
 				}
-				else{
+
+				else {
 					$('#error').empty();
 					$('#error').append('Wrong username or password. Try again.');
 					document.getElementById('pw').value = '';
 				}
-			});
+			}, 'json');
 		});
 	</script>
 </body>

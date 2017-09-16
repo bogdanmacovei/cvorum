@@ -22,11 +22,16 @@
     		<textarea maxlength="30" placeholder = "Title" id = "title" cols = "131" rows = "1"></textarea> <br> <br>
     		<textarea maxlength="250" placeholder = "Content" id = "content" cols = "131" rows = "7"></textarea> <br> <br>
     		<button class = "postbtn" id = "post" style = "width:15%"> Post </button>
-    		</div>
     	</div>
+  </div>
     	<br>
 
-    	   <div class = "posts"> </div>
+    	<div class = "posts"> </div>
+        <div align = "right"> 
+        
+          <div id = "nextprevlast"> </div> <br>
+
+        </div>
       </div>
 
   <div id = "sidebar"> <br>
@@ -42,6 +47,12 @@
 
     if (!document.cookie)
       $('#flip').hide();
+
+    var url = new URL(window.location.href);
+    var pid = url.searchParams.get('page');
+
+    var backpage = Number(pid) - 1;
+    var nextpage = Number(pid) + 1;
 
     // select user by id with AngularJS
 
@@ -60,7 +71,7 @@
       });
 
   		function write_posts(nr, date) {
-  			for(var i = nr - 1; i >= 0; i--){
+  			for(var i = 0; i < nr; i++) {
   				$('.posts').append('<div class = "content1">\
   									            <div>\
                                   <font size ="5" >\
@@ -86,12 +97,11 @@
             return;
 
   				$.get('/deletepost/' + $(this).attr('id'), function(date){});
-  				window.location = '/browse';
+  				window.location = '/browse.html?page=1';
   			});
   		});
 
-
-  		$.get('/selectallpost', function(date){
+  		$.get('/selectallpost/' + pid, function(date){
   			var nr = date.length;
   			write_posts(nr, date);
   			
@@ -122,15 +132,40 @@
 
   			$.post('/insertpost', data, function(date){}, 'json');
   			alert('Post created ' + data._date);
-  			window.location = '/browse';
+  			window.location = '/browse.html?page=1';
 
 		});
+
+      if (Number(pid) === 1) {
+
+        $('#nextprevlast').append('<a class = "pagination" href = "/browse.html?page=' + 1 + '"><b>&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;</b></a>&nbsp;');
+        $('#nextprevlast').append('<a class = "pagination" href = "/browse.html?page=' + nextpage + '"><b>Next</b></a>&nbsp;');
+
+      }
+
+      else {
+        $('#nextprevlast').append('<a class = "pagination" href = "/browse.html?page=' + 1 + '"><b>&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;</b></a>&nbsp;');
+        $('#nextprevlast').append('<a class = "pagination" href = "/browse.html?page=' + backpage + '"><b>Back</b></a>&nbsp;');
+        $('#nextprevlast').append('<a class = "pagination" href = "/browse.html?page=' + nextpage + '"><b>Next</b></a>&nbsp;');
+      }
+      
+
+        $.get('/postnumber', function(data) {
+          var nr = Number (data[0].number);
+          var rest = nr % 5;
+
+          if (rest) 
+            nr = Math.trunc(nr / 5 + 1);
+          else 
+            nr = nr / 5;
+
+          $('#nextprevlast').append('<a class = "pagination" href = "/browse.html?page=' + nr + '"><b>&nbsp;&nbsp;&nbsp;' + nr +'&nbsp;&nbsp;&nbsp;</b></a>');
+        }); 
 
 
 
   	</script>
 
-  	
-	
 </body>
+
 </html>
